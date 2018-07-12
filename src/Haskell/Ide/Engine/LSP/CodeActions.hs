@@ -49,14 +49,14 @@ handleCodeActionReq tn commandMap req = do
         concatMap isRenamableDiag diags
       redundantImportActions = concatMap (uncurry (mkRedundantImportActions docId)) $
         mapMaybe isRedundantImportDiag diags
-      
+
       plainActions = renamableActions ++ hlintActions ++ redundantImportActions
 
       -- For these diagnostics need to search hoogle before we can make code actions
       addPackageDiags = mapMaybe isPackageAddableDiag diags
       importableDiags = mapMaybe isImportableDiag diags
 
-  
+
 
   makeSearches Hoogle.searchPackages (mkAddPackageAction maybeRootDir) addPackageDiags $ \addPackageActions ->
     makeSearches Hoogle.searchModules mkImportAction importableDiags $ \importActions ->
@@ -67,144 +67,144 @@ handleCodeActionReq tn commandMap req = do
           -- will go to:
           -- myFunc
           let relaxed = map (bimap id (head . T.words)) importableDiags
-              allActions = ((plainActions ++ addPackageActions) ++) 
+              allActions = ((plainActions ++ addPackageActions) ++)
           in makeSearches Hoogle.searchModules mkImportAction relaxed (send . allActions)
         else send (plainActions ++ addPackageActions ++ importActions)
 
   where
-  params = req ^. J.params
-  doc = params ^. J.textDocument . J.uri
-  (J.List diags) = params ^. J.context . J.diagnostics
+    params = req ^. J.params
+    doc = params ^. J.textDocument . J.uri
+    (J.List diags) = params ^. J.context . J.diagnostics
 
-  wrapCodeAction :: (J.CodeAction, J.Command) -> R (Maybe J.CommandOrCodeAction)
-  wrapCodeAction (action, cmd) = do
-    (C.ClientCapabilities _ textDocCaps _) <- asksLspFuncs Core.clientCapabilities
-    let literalSupport = textDocCaps >>= C._codeAction >>= C._codeActionLiteralSupport
-    case literalSupport of
-      Nothing -> return $ Just (J.CommandOrCodeActionCommand cmd)
-      -- We only need the workspace edit, command gets applied as well if we provide it
-      Just _ -> return $ Just (J.CommandOrCodeActionCodeAction action)
+    wrapCodeAction :: (J.CodeAction, J.Command) -> R (Maybe J.CommandOrCodeAction)
+    wrapCodeAction (action, cmd) = do
+      (C.ClientCapabilities _ textDocCaps _) <- asksLspFuncs Core.clientCapabilities
+      let literalSupport = textDocCaps >>= C._codeAction >>= C._codeActionLiteralSupport
+      case literalSupport of
+        Nothing -> return $ Just (J.CommandOrCodeActionCommand cmd)
+        -- We only need the workspace edit, command gets applied as well if we provide it
+        Just _ -> return $ Just (J.CommandOrCodeActionCodeAction action)
 
-  send :: [(J.CodeAction, J.Command)] -> R ()
-  send codeActions = do
-    body <- J.List . catMaybes <$> mapM wrapCodeAction codeActions
-    reactorSend $ RspCodeAction $ Core.makeResponseMessage req body
+    send :: [(J.CodeAction, J.Command)] -> R ()
+    send codeActions = do
+      body <- J.List . catMaybes <$> mapM wrapCodeAction codeActions
+      reactorSend $ RspCodeAction $ Core.makeResponseMessage req body
 
-  -- mkXActions need to return both a code action and a command for fallbacks to older clients
-  -- that don't support code action kinds
-  mkHlintAction :: J.Diagnostic -> Maybe (J.CodeAction, J.Command)
-  mkHlintAction diag@(J.Diagnostic (J.Range start _) _s (Just code) (Just "hlint") m _) = Just (codeAction, cmd)
-    where
-      codeAction = J.CodeAction title (Just J.CodeActionRefactor) (Just (J.List [diag])) Nothing (Just cmd)
-      title :: T.Text
-      title = "Apply hint:" <> head (T.lines m)
-      -- NOTE: the cmd needs to be registered via the InitializeResponse message. See hieOptions above
-      cmd = J.Command title cmdName cmdparams
-      cmdName = commandMap BM.! "applyrefact:applyOne"
-      -- need 'file', 'start_pos' and hint title (to distinguish between alternative suggestions at the same location)
-      args = J.toJSON [ApplyRefact.AOP doc start code]
-      cmdparams = Just args
-  mkHlintAction (J.Diagnostic _r _s _c _source _m _) = Nothing
+    -- mkXActions need to return both a code action and a command for fallbacks to older clients
+    -- that don't support code action kinds
+    mkHlintAction :: J.Diagnostic -> Maybe (J.CodeAction, J.Command)
+    mkHlintAction diag@(J.Diagnostic (J.Range start _) _s (Just code) (Just "hlint") m _) = Just (codeAction, cmd)
+      where
+        codeAction = J.CodeAction title (Just J.CodeActionRefactor) (Just (J.List [diag])) Nothing (Just cmd)
+        title :: T.Text
+        title = "Apply hint:" <> head (T.lines m)
+        -- NOTE: the cmd needs to be registered via the InitializeResponse message. See hieOptions above
+        cmd = J.Command title cmdName cmdparams
+        cmdName = commandMap BM.! "applyrefact:applyOne"
+        -- need 'file', 'start_pos' and hint title (to distinguish between alternative suggestions at the same location)
+        args = J.toJSON [ApplyRefact.AOP doc start code]
+        cmdparams = Just args
+    mkHlintAction (J.Diagnostic _r _s _c _source _m _) = Nothing
 
-  mkRenamableAction :: J.VersionedTextDocumentIdentifier -> J.Diagnostic -> T.Text -> (J.CodeAction, J.Command)
-  mkRenamableAction docId diag replacement = (codeAction, cmd)
-    where
-      title = "Replace with " <> replacement
+    mkRenamableAction :: J.VersionedTextDocumentIdentifier -> J.Diagnostic -> T.Text -> (J.CodeAction, J.Command)
+    mkRenamableAction docId diag replacement = (codeAction, cmd)
+      where
+        title = "Replace with " <> replacement
 
-      workspaceEdit = J.WorkspaceEdit (Just changes) (Just docChanges)
-      changes = HM.singleton doc (J.List [textEdit])
-      docChanges = J.List [textDocEdit]
-      textDocEdit = J.TextDocumentEdit docId (J.List [textEdit])
-      textEdit = J.TextEdit (diag ^. J.range) replacement
+        workspaceEdit = J.WorkspaceEdit (Just changes) (Just docChanges)
+        changes = HM.singleton doc (J.List [textEdit])
+        docChanges = J.List [textDocEdit]
+        textDocEdit = J.TextDocumentEdit docId (J.List [textEdit])
+        textEdit = J.TextEdit (diag ^. J.range) replacement
 
-      cmd = J.Command title cmdName (Just cmdParams)
-      cmdName = commandMap BM.! "hie:applyWorkspaceEdit"
-      --TODO: Support the name parameter in J.Applyworkspaceeditparams
-      cmdParams = J.toJSON [J.ApplyWorkspaceEditParams workspaceEdit]
+        cmd = J.Command title cmdName (Just cmdParams)
+        cmdName = commandMap BM.! "hie:applyWorkspaceEdit"
+        --TODO: Support the name parameter in J.Applyworkspaceeditparams
+        cmdParams = J.toJSON [J.ApplyWorkspaceEditParams workspaceEdit]
 
-      codeAction = J.CodeAction title (Just J.CodeActionQuickFix) (Just (J.List [diag])) (Just workspaceEdit) Nothing
-  
-  mkRedundantImportActions :: J.VersionedTextDocumentIdentifier -> J.Diagnostic -> T.Text -> [(J.CodeAction, J.Command)]
-  mkRedundantImportActions docId diag moduleName = [(removeAction, removeCmd), (importAction, importCmd)]
-    where
-      removeAction = J.CodeAction "Remove redundant import"
-                                  (Just J.CodeActionQuickFix)
-                                  (Just (J.List [diag]))
-                                  (Just removeEdit)
-                                  Nothing
+        codeAction = J.CodeAction title (Just J.CodeActionQuickFix) (Just (J.List [diag])) (Just workspaceEdit) Nothing
 
-      removeCmd = cmd "Remove redundant import" removeEdit
+    mkRedundantImportActions :: J.VersionedTextDocumentIdentifier -> J.Diagnostic -> T.Text -> [(J.CodeAction, J.Command)]
+    mkRedundantImportActions docId diag moduleName = [(removeAction, removeCmd), (importAction, importCmd)]
+      where
+        removeAction = J.CodeAction "Remove redundant import"
+                                    (Just J.CodeActionQuickFix)
+                                    (Just (J.List [diag]))
+                                    (Just removeEdit)
+                                    Nothing
 
-      removeEdit = workspaceEdit (J.TextEdit range "")
-        where
-          range = J.Range (diag ^. J.range . J.start)
-                          (J.Position ((diag ^. J.range . J.start . J.line) + 1) 0)
+        removeCmd = cmd "Remove redundant import" removeEdit
 
-      importAction = J.CodeAction "Import instances"
-                                  (Just J.CodeActionQuickFix)
-                                  (Just (J.List [diag]))
-                                  (Just importEdit)
-                                  Nothing
-      importCmd = cmd "Import instances" importEdit
-          --TODO: Use hsimport to preserve formatting/whitespace
-      importEdit = workspaceEdit tEdit
-        where
-          tEdit = J.TextEdit (diag ^. J.range) ("import " <> moduleName <> "()")
-      
-      workspaceEdit textEdit = J.WorkspaceEdit (Just changes) (Just docChanges)
-        where
-          changes = HM.singleton doc (J.List [textEdit])
-          docChanges = J.List [textDocEdit]
-          textDocEdit = J.TextDocumentEdit docId (J.List [textEdit])
-          
+        removeEdit = workspaceEdit (J.TextEdit range "")
+          where
+            range = J.Range (diag ^. J.range . J.start)
+                            (J.Position ((diag ^. J.range . J.start . J.line) + 1) 0)
 
-      cmd title wEdit = J.Command title cmdName (Just (cmdParams wEdit))
-      cmdName = commandMap BM.! "hie:applyWorkspaceEdit"
-      cmdParams wEdit = J.toJSON [J.ApplyWorkspaceEditParams wEdit]
+        importAction = J.CodeAction "Import instances"
+                                    (Just J.CodeActionQuickFix)
+                                    (Just (J.List [diag]))
+                                    (Just importEdit)
+                                    Nothing
+        importCmd = cmd "Import instances" importEdit
+            --TODO: Use hsimport to preserve formatting/whitespace
+        importEdit = workspaceEdit tEdit
+          where
+            tEdit = J.TextEdit (diag ^. J.range) ("import " <> moduleName <> "()")
 
-  --TODO: Check if package is already installed
-  mkImportAction :: J.Diagnostic -> T.Text -> Maybe (J.CodeAction, J.Command)
-  mkImportAction diag modName = Just (codeAction, cmd)
-    where
-      codeAction = J.CodeAction title (Just J.CodeActionQuickFix) (Just (J.List [diag])) Nothing (Just cmd)
-      cmd = J.Command title cmdName (Just cmdParams)
-      title = "Import module " <> modName
-      cmdName = commandMap BM.! "hsimport:import"
-      cmdParams = J.toJSON [HsImport.ImportParams doc modName]
+        workspaceEdit textEdit = J.WorkspaceEdit (Just changes) (Just docChanges)
+          where
+            changes = HM.singleton doc (J.List [textEdit])
+            docChanges = J.List [textDocEdit]
+            textDocEdit = J.TextDocumentEdit docId (J.List [textEdit])
 
-  mkAddPackageAction :: Maybe FilePath -> J.Diagnostic -> T.Text -> Maybe (J.CodeAction, J.Command)
-  mkAddPackageAction (Just rootDir) diag packageName = case J.uriToFilePath doc of
-    Just docFp ->
-      let title = "Add " <> packageName <> " as a dependency"
-          cmd = J.Command title (commandMap BM.! "package:add") (Just cmdParams)
-          cmdParams = J.toJSON [AddParams rootDir docFp packageName]
-      in Just $ (J.CodeAction title (Just J.CodeActionQuickFix) (Just (J.List [diag])) Nothing (Just cmd), cmd)
-    _ -> Nothing
-  mkAddPackageAction _ _ _ = Nothing
 
-  -- | Execute multiple ide requests sequentially
-  collectRequests :: (a -> IdeM (IdeResponse b)) -- ^ The requests to make
-                  -> [a]                         -- ^ The inputs to the requests
-                  -> ([(a, b)] -> R ())          -- ^ Callback with the request inputs and results
-                  -> R ()
-  collectRequests = go []
-    where
-      go acc _ [] callback = callback acc
-      go acc ideReq (x:xs) callback =
-        let reqCallback result = go (acc ++ [(x, result)]) ideReq xs callback
-        in makeRequest $ IReq tn (req ^. J.id) reqCallback (ideReq x)
+        cmd title wEdit = J.Command title cmdName (Just (cmdParams wEdit))
+        cmdName = commandMap BM.! "hie:applyWorkspaceEdit"
+        cmdParams wEdit = J.toJSON [J.ApplyWorkspaceEditParams wEdit]
 
-  -- | Make multiple hoogle searches at once to construct code actions
-  makeSearches :: (T.Text -> IdeM (IdeResponse [T.Text]))                    -- ^ The search function
-             -> (J.Diagnostic -> T.Text -> Maybe (J.CodeAction, J.Command))  -- ^ A function to construct actions
-             -> [(J.Diagnostic, T.Text)]                                     -- ^ Input diagnostics and search terms
-             -> ([(J.CodeAction, J.Command)] -> R ())                        -- ^ Callback
-             -> R ()
-  makeSearches search maker xs callback = collectRequests (search . snd) xs $ \allResults -> do
-    let actions = concatMap (\((diag, _), results) -> mapMaybe (maker diag) results) allResults
-    callback actions
+    --TODO: Check if package is already installed
+    mkImportAction :: J.Diagnostic -> T.Text -> Maybe (J.CodeAction, J.Command)
+    mkImportAction diag modName = Just (codeAction, cmd)
+      where
+        codeAction = J.CodeAction title (Just J.CodeActionQuickFix) (Just (J.List [diag])) Nothing (Just cmd)
+        cmd = J.Command title cmdName (Just cmdParams)
+        title = "Import module " <> modName
+        cmdName = commandMap BM.! "hsimport:import"
+        cmdParams = J.toJSON [HsImport.ImportParams doc modName]
 
--- TODO: make context specific commands for all sorts of things, such as refactorings          
+    mkAddPackageAction :: Maybe FilePath -> J.Diagnostic -> T.Text -> Maybe (J.CodeAction, J.Command)
+    mkAddPackageAction (Just rootDir) diag packageName = case J.uriToFilePath doc of
+      Just docFp ->
+        let title = "Add " <> packageName <> " as a dependency"
+            cmd = J.Command title (commandMap BM.! "package:add") (Just cmdParams)
+            cmdParams = J.toJSON [AddParams rootDir docFp packageName]
+        in Just $ (J.CodeAction title (Just J.CodeActionQuickFix) (Just (J.List [diag])) Nothing (Just cmd), cmd)
+      _ -> Nothing
+    mkAddPackageAction _ _ _ = Nothing
+
+    -- | Execute multiple ide requests sequentially
+    collectRequests :: (a -> IdeM (IdeResponse b)) -- ^ The requests to make
+                    -> [a]                         -- ^ The inputs to the requests
+                    -> ([(a, b)] -> R ())          -- ^ Callback with the request inputs and results
+                    -> R ()
+    collectRequests = go []
+      where
+        go acc _ [] callback = callback acc
+        go acc ideReq (x:xs) callback =
+          let reqCallback result = go (acc ++ [(x, result)]) ideReq xs callback
+          in makeRequest $ IReq tn (req ^. J.id) reqCallback (ideReq x)
+
+    -- | Make multiple hoogle searches at once to construct code actions
+    makeSearches :: (T.Text -> IdeM (IdeResponse [T.Text]))                    -- ^ The search function
+               -> (J.Diagnostic -> T.Text -> Maybe (J.CodeAction, J.Command))  -- ^ A function to construct actions
+               -> [(J.Diagnostic, T.Text)]                                     -- ^ Input diagnostics and search terms
+               -> ([(J.CodeAction, J.Command)] -> R ())                        -- ^ Callback
+               -> R ()
+    makeSearches search maker xs callback = collectRequests (search . snd) xs $ \allResults -> do
+      let actions = concatMap (\((diag, _), results) -> mapMaybe (maker diag) results) allResults
+      callback actions
+
+-- TODO: make context specific commands for all sorts of things, such as refactorings
 
 isImportableDiag :: J.Diagnostic -> Maybe (J.Diagnostic, T.Text)
 isImportableDiag diag@(J.Diagnostic _ _ _ (Just "ghcmod") msg _) = (diag,) <$> extractImportableTerm msg
