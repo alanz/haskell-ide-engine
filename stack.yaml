@@ -18,12 +18,12 @@ packages:
     - .
     - core
 
-- location:
-    ./submodules/haskell-lsp
-  extra-dep: true
-  subdirs:
-    - .
-    - haskell-lsp-types
+# - location:
+#     ./submodules/haskell-lsp
+#   extra-dep: true
+#   subdirs:
+#     - .
+#     - haskell-lsp-types
 
 - location:
     ./submodules/haskell-lsp-test
@@ -36,6 +36,8 @@ extra-deps:
 - constrained-dynamic-0.1.0.0
 - haddock-api-2.20.0
 - haddock-library-1.6.0
+- haskell-lsp-0.4.0.0
+- haskell-lsp-types-0.4.0.0
 - syz-0.2.0.0
 - temporary-1.2.1.1
 - hsimport-0.8.6

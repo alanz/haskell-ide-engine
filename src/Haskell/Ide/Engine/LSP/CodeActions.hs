@@ -33,7 +33,7 @@ handleCodeActionReq tn commandMap req = do
   let docVersion = case maybeVf of
         Just vf -> _version vf
         Nothing -> 0
-      docId = J.VersionedTextDocumentIdentifier doc docVersion
+      docId = J.VersionedTextDocumentIdentifier doc (Just docVersion)
 
   maybeRootDir <- asksLspFuncs Core.rootPath
 
