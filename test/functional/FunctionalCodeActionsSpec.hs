@@ -329,7 +329,7 @@ spec = describe "code actions" $ do
 
         executeCodeAction $ head cas
 
-        contents <- documentContents doc
+        contents <- getDocumentEdit doc
 
         let expected = "\n{-# LANGUAGE \"TypeSynonymInstances\" #-}\n\
                        \import GHC.Generics\n\n\
