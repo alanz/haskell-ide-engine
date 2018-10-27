@@ -21,6 +21,7 @@ library
                        Haskell.Ide.Engine.ArtifactMap
                        Haskell.Ide.Engine.Compat
                        Haskell.Ide.Engine.GhcModuleCache
+                       Haskell.Ide.Engine.HotSwap
                        Haskell.Ide.Engine.IdeFunctions
                        Haskell.Ide.Engine.ModuleCache
                        Haskell.Ide.Engine.Monad
@@ -28,14 +29,15 @@ library
                        Haskell.Ide.Engine.MonadTypes
                        Haskell.Ide.Engine.MultiThreadState
                        Haskell.Ide.Engine.PluginDescriptor
-                       Haskell.Ide.Engine.PluginsIdeMonads
                        Haskell.Ide.Engine.PluginUtils
+                       Haskell.Ide.Engine.PluginsIdeMonads
   build-depends:       base >= 4.9 && < 5
                      , Diff
                      , aeson
                      , constrained-dynamic
                      , containers
                      , directory
+                     , deepseq
                      , filepath
                      , fingertree
                      , free

@@ -1,6 +1,7 @@
 packages:
          ./
          ./hie-plugin-api/
+         ./hie-hotswap-eg/
 
          ./submodules/brittany
          ./submodules/HaRe

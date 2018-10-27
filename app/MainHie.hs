@@ -23,6 +23,10 @@ import           System.Environment
 import qualified System.Log.Logger                     as L
 import qualified System.Remote.Monitoring.Wai          as EKG
 
+import GHC.Hotswap
+import Haskell.Ide.Engine.HotSwap
+-- import Types
+
 -- ---------------------------------------------------------------------
 -- plugins
 
@@ -40,6 +44,8 @@ import           Haskell.Ide.Engine.Plugin.HsImport
 import           Haskell.Ide.Engine.Plugin.Liquid
 import           Haskell.Ide.Engine.Plugin.Package
 import           Haskell.Ide.Engine.Plugin.Pragmas
+-- Temporary, to confirm the basic plugin works
+-- import           Haskell.Ide.Engine.Plugin.ExampleHotLoad
 
 -- ---------------------------------------------------------------------
 
@@ -63,6 +69,8 @@ plugins includeExamples = pluginDescToIdePlugins allPlugins
       , liquidDescriptor      "liquid"
       , packageDescriptor     "package"
       , pragmasDescriptor     "pragmas"
+      -- Temporary
+      -- , exampleHlDescriptor   "eghl"
       ]
     examplePlugins =
       [example2Descriptor "eg2"
@@ -113,6 +121,17 @@ run opts = do
   when (projGhcVersion /= hieGhcVersion) $
     warningm $ "Mismatching GHC versions: Project is " ++ projGhcVersion
             ++ ", HIE is " ++ hieGhcVersion
+
+  -- Register a shared object
+  let so_path = "/home/alanz/mysrc/github/alanz/haskell-ide-engine/hie-hotswap-eg/dist-newstyle/build/x86_64-linux/ghc-8.4.3/hie-hotswap-eg-0.2.2.0/build/Haskell/Ide/Engine/Plugin/ExampleHotLoad.o"
+  so <- registerHotswap "hs_soHandles" so_path
+  eghs <- withSO so $ \(SOHandles plu) -> do
+    -- return $ plu "eghs"
+    return $ plu
+  -- logm $ "Hotloaded plugin:" ++ show (pluginName eghs)
+  logm $ "Hotloaded plugin:" ++ (eghs)
+
+
 
   when (optEkg opts) $ do
     logm $ "Launching EKG server on port " ++ show (optEkgPort opts)

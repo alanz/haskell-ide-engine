@@ -104,9 +104,11 @@ executable hie
   build-depends:       base
                      , directory
                      , ekg-wai
+                     , ghc-hotswap
                      , ghc-mod-core
                      , haskell-ide-engine
                      , haskell-lsp
+                     -- , hie-hotswap-eg
                      , hie-plugin-api
                      , hslogger
                      , optparse-simple

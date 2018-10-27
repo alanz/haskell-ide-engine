@@ -1,0 +1,6 @@
+packages:
+         ./
+         ../hie-plugin-api
+         ../submodules/ghc-mod/core
+
+configure-options: --enable-library-for-ghci
