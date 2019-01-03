@@ -30,8 +30,9 @@ import           Haskell.Ide.Engine.MonadTypes
 import           Haskell.Ide.Engine.PluginUtils
 import           System.Directory                       (doesFileExist,
                                                          getCurrentDirectory,
-                                                         getDirectoryContents,
-                                                         makeAbsolute)
+                                                         getDirectoryContents
+                                                         -- makeAbsolute
+                                                        )
 import           System.FilePath                        (makeRelative,
                                                          normalise,
                                                          takeExtension,
@@ -256,8 +257,9 @@ prepareHelper = CmdSync $ \req -> withCommonArgs req $ do
   return $ IdeResultOk ()
 
 prepareHelper' :: MonadIO m => FilePath -> FilePath -> FilePath -> m ()
-prepareHelper' distDir' cabalExe dir =
-  prepare $ (mkQueryEnv dir distDir') {qePrograms = defaultPrograms {cabalProgram = cabalExe}}
+prepareHelper' _ _ _ = liftIO $ error "AZ:TODO: prepareHelper'"
+-- prepareHelper' distDir' cabalExe dir =
+  -- prepare $ (mkQueryEnv dir distDir') {qePrograms = defaultPrograms {cabalProgram = cabalExe}}
 
 -----------------------------------------------
 
@@ -299,10 +301,10 @@ instance ToJSON ListFlagsParams where
 
 listFlags :: CommandFunc ListFlagsParams Object
 listFlags = CmdSync $ \(LF mode) -> do
-      cwd <- liftIO getCurrentDirectory
+      cwd' <- liftIO getCurrentDirectory
       flags0 <- liftIO $ case mode of
-            "stack" -> listFlagsStack cwd
-            "cabal" -> fmap (:[]) (listFlagsCabal cwd)
+            "stack" -> listFlagsStack cwd'
+            "cabal" -> fmap (:[]) (listFlagsCabal cwd')
             _oops -> return []
       let flags' = flip map flags0 $ \(n,f) ->
                     object ["packageName" .= n, "flags" .= map flagToJSON f]
@@ -375,8 +377,8 @@ buildDirectory = CmdSync $ \(BP m dd c s f mbDir) -> withCommonArgs (CommonParam
           _ <- readProcess (caStack ca) ["build"] ""
           return $ IdeResultOk ()
         Just dir0 -> pluginGetFile "buildDirectory" dir0 $ \dir -> do
-          cwd <- getCurrentDirectory
-          let relDir = makeRelative cwd $ normalise dir
+          cwd' <- getCurrentDirectory
+          let relDir = makeRelative cwd' $ normalise dir
           _ <- readProcess (caStack ca) ["build", relDir] ""
           return $ IdeResultOk ()
 
@@ -448,28 +450,30 @@ listStackTargets distDir' = do
   mapM (listCabalTargets distDir') stackPackageDirs
 
 listCabalTargets :: MonadIO m => FilePath -> FilePath -> m Package
-listCabalTargets distDir' dir =
-  runQuery (mkQueryEnv dir distDir') $ do
-    pkgName' <- fst <$> packageId
-    cc <- components $ (,) CH.<$> entrypoints
-    let comps = map (fixupLibraryEntrypoint pkgName' .snd) cc
-    absDir <- liftIO $ makeAbsolute dir
-    return $ Package pkgName' absDir comps
-  where
--- # if MIN_VERSION_Cabal(2,0,0)
-#if MIN_VERSION_Cabal(1,24,0)
-    fixupLibraryEntrypoint _n ChLibName = ChLibName
-#else
-    fixupLibraryEntrypoint n (ChLibName "") = ChLibName n
-#endif
-    fixupLibraryEntrypoint _ e = e
+listCabalTargets _ _ = liftIO $ error "AZ:TODO listCabalTargets"
+-- listCabalTargets distDir' dir =
+--   runQuery (mkQueryEnv dir distDir') $ do
+--     pkgName' <- fst <$> packageId
+--     cc <- components $ (,) CH.<$> entrypoints
+--     let comps = map (fixupLibraryEntrypoint pkgName' .snd) cc
+--     absDir <- liftIO $ makeAbsolute dir
+--     return $ Package pkgName' absDir comps
+--   where
+-- -- # if MIN_VERSION_Cabal(2,0,0)
+-- #if MIN_VERSION_Cabal(1,24,0)
+--     fixupLibraryEntrypoint _n ChLibName = ChLibName
+-- #else
+--     fixupLibraryEntrypoint n (ChLibName "") = ChLibName n
+-- #endif
+--     fixupLibraryEntrypoint _ e = e
 
 -- Example of new way to use cabal helper 'entrypoints' is a ComponentQuery,
 -- components applies it to all components in the project, the semigroupoids
 -- apply batches the result per component, and returns the component as the last
 -- item.
-getComponents :: QueryEnv -> IO [(ChEntrypoint,ChComponentName)]
-getComponents env = runQuery env $ components $ (,) CH.<$> entrypoints
+getComponents :: QueryEnv pt -> IO [(ChEntrypoint,ChComponentName)]
+-- getComponents env = runQuery env $ components $ (,) CH.<$> entrypoints
+getComponents _env = error "AZ:TODO getComponents"
 
 -----------------------------------------------
 
@@ -498,28 +502,29 @@ getStackLocalPackages stackYamlFile = withBinaryFileContents stackYamlFile $ \co
   return stackLocalPackages
 
 compToJSON :: ChComponentName -> Value
-compToJSON ChSetupHsName = object ["type" .= ("setupHs" :: T.Text)]
-#if MIN_VERSION_Cabal(1,24,0)
-compToJSON ChLibName        = object ["type" .= ("library" :: T.Text)]
-compToJSON (ChSubLibName n) = object ["type" .= ("library" :: T.Text), "name" .= n]
-compToJSON (ChFLibName   n) = object ["type" .= ("library" :: T.Text), "name" .= n]
-#else
-compToJSON (ChLibName   n) = object ["type" .= ("library" :: T.Text), "name" .= n]
-#endif
-compToJSON (ChExeName   n) = object ["type" .= ("executable" :: T.Text), "name" .= n]
-compToJSON (ChTestName  n) = object ["type" .= ("test" :: T.Text), "name" .= n]
-compToJSON (ChBenchName n) = object ["type" .= ("benchmark" :: T.Text), "name" .= n]
+compToJSON = error "AZ:TODO compToJSON"
+-- compToJSON ChSetupHsName = object ["type" .= ("setupHs" :: T.Text)]
+-- #if MIN_VERSION_Cabal(1,24,0)
+-- compToJSON ChLibName        = object ["type" .= ("library" :: T.Text)]
+-- compToJSON (ChSubLibName n) = object ["type" .= ("library" :: T.Text), "name" .= n]
+-- compToJSON (ChFLibName   n) = object ["type" .= ("library" :: T.Text), "name" .= n]
+-- #else
+-- compToJSON (ChLibName   n) = object ["type" .= ("library" :: T.Text), "name" .= n]
+-- #endif
+-- compToJSON (ChExeName   n) = object ["type" .= ("executable" :: T.Text), "name" .= n]
+-- compToJSON (ChTestName  n) = object ["type" .= ("test" :: T.Text), "name" .= n]
+-- compToJSON (ChBenchName n) = object ["type" .= ("benchmark" :: T.Text), "name" .= n]
 
 -----------------------------------------------
 
 getDistDir :: OperationMode -> FilePath -> IO FilePath
 getDistDir CabalMode _ = do
-    cwd <- getCurrentDirectory
-    return $ cwd </> defaultDistPref
+    cwd' <- getCurrentDirectory
+    return $ cwd' </> defaultDistPref
 getDistDir StackMode stackExe = do
-    cwd <- getCurrentDirectory
+    cwd' <- getCurrentDirectory
     dist <- init <$> readProcess stackExe ["path", "--dist-dir"] ""
-    return $ cwd </> dist
+    return $ cwd' </> dist
 
 isCabalFile :: FilePath -> Bool
 isCabalFile f = takeExtension' f == ".cabal"

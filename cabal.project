@@ -7,6 +7,9 @@ packages:
          ./submodules/cabal-helper/
          ./submodules/ghc-mod/
          ./submodules/ghc-mod/core/
+         -- ./../cabal-helper/
+         -- ./../ghc-mod/
+         -- ./../ghc-mod/core/
 
 
 -- allow-newer:ekg-core-0.1.1.4:base

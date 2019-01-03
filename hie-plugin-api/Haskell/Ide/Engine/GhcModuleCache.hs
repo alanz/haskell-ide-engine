@@ -85,6 +85,6 @@ data GhcModuleCache = GhcModuleCache
   { cradleCache :: !(Map.Map FilePath GM.Cradle)
               -- ^ map from dirs to cradles
   , uriCaches  :: !UriCaches
-  } deriving (Show)
+  }
 
 -- ---------------------------------------------------------------------
