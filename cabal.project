@@ -8,3 +8,11 @@ packages:
          ./submodules/ghc-mod/
          ./submodules/ghc-mod/core/
          ./submodules/floskell
+
+         -- ./../cabal-helper/
+         -- ./../ghc-mod/
+         -- ./../ghc-mod/core/
+
+
+-- allow-newer:ekg-core-0.1.1.4:base
+-- allow-newer:ekg-json-0.1.0.6:base
