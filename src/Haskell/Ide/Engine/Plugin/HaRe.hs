@@ -21,9 +21,9 @@ import qualified Data.Text                                    as T
 import qualified Data.Text.IO                                 as T
 import           Exception
 import           GHC.Generics                                 (Generic)
-import qualified GhcMod.Error                                 as GM (GHandler(..),gcatches)
-import qualified GhcMod.Monad                                 as GM (GmlT(..),GhcModError(..))
-import qualified GhcMod.Utils                                 as GM (withMappedFile)
+import qualified GhcModCore                                   as GM (GHandler(..),gcatches,
+                                                                     GmlT(..),GhcModError(..),
+                                                                     withMappedFile)
 import           Haskell.Ide.Engine.ArtifactMap
 import           Haskell.Ide.Engine.MonadFunctions
 import           Haskell.Ide.Engine.MonadTypes

@@ -35,10 +35,10 @@ import           Exception (ExceptionMonad)
 import           System.Directory
 import           System.FilePath
 
-import qualified GhcMod.Cradle as GM (findCradle')
-import qualified GhcMod.Monad  as GM (unGmlT,GmEnv,gmeLocal,gmCradle,MonadIO(..),GmLog(..),GmOut(..),cradle,options)
-import qualified GhcMod.Types  as GM (Cradle(..),optPrograms)
-import qualified GhcMod.Utils  as GM (mkRevRedirMapFunc)
+import qualified GhcModCore as GM
+                        (findCradle',unGmlT,GmEnv,gmeLocal,gmCradle,
+                         MonadIO(..),GmLog(..),GmOut(..),cradle,options,
+                         Cradle(..),optPrograms,mkRevRedirMapFunc)
 import qualified GHC           as GHC
 
 import           Haskell.Ide.Engine.ArtifactMap

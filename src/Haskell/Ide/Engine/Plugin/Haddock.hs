@@ -21,8 +21,7 @@ import           System.Directory
 import           System.FilePath
 import           GHC
 import           GhcMonad
-import qualified GhcMod.Monad                                 as GM (LightGhc(..))
-import qualified GhcMod.LightGhc                              as GM (runLightGhc)
+import qualified GhcModCore                                 as GM (LightGhc(..),runLightGhc)
 import           Haskell.Ide.Engine.MonadTypes
 import           Haskell.Ide.Engine.MonadFunctions
 import           Haskell.Ide.Engine.Plugin.HieExtras

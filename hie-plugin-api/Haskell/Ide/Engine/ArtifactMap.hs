@@ -9,8 +9,7 @@ import qualified GHC
 import           GHC                               (TypecheckedModule)
 import qualified SrcLoc                            as GHC
 import qualified Var
-import qualified GhcMod.Gap                        as GM (GhcPs,GhcRn,GhcTc)
-import           GhcMod.SrcUtils
+import qualified GhcModCore                        as GM (GhcPs,GhcRn,GhcTc,collectAllSpansTypes)
 
 import           Language.Haskell.LSP.Types
 
@@ -35,7 +34,7 @@ genIntervalMap ts = foldr go IM.empty ts
 
 genTypeMap :: GHC.GhcMonad m => TypecheckedModule -> m TypeMap
 genTypeMap tm = do
-    ts <- collectAllSpansTypes True tm
+    ts <- GM.collectAllSpansTypes True tm
     return $ foldr go IM.empty ts
   where
     go (GHC.RealSrcSpan spn, typ) im =

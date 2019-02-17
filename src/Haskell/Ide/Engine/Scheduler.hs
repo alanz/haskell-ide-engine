@@ -32,7 +32,7 @@ import           Control.Monad
 import qualified Data.Set                      as Set
 import qualified Data.Map                      as Map
 import qualified Data.Text                     as T
-import qualified GhcMod.Types                  as GM (Options(..),MonadIO(..))
+import qualified GhcModCore                    as GM (Options(..),MonadIO(..))
 import qualified Language.Haskell.LSP.Core     as Core
 import qualified Language.Haskell.LSP.Types    as J
 

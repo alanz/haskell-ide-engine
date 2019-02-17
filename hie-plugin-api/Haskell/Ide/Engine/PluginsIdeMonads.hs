@@ -99,8 +99,7 @@ import           Data.Typeable                  ( TypeRep
                                                 , Typeable
                                                 )
 
-import qualified GhcMod.Monad                  as GM (runGhcModT,MonadIO(..),GhcModT)
-import qualified GhcMod.Types                  as GM (Options(..))
+import qualified GhcModCore                  as GM (runGhcModT,MonadIO(..),GhcModT,Options(..))
 import           GHC.Generics
 import           GHC                            ( HscEnv )
 
