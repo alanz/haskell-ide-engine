@@ -9,6 +9,7 @@ packages:
          ./submodules/ghc-mod/core/
          ./submodules/floskell
 
+         -- ./../HaRe/
          -- ./../cabal-helper/
          -- ./../ghc-mod/
          -- ./../ghc-mod/core/
