@@ -5,7 +5,6 @@ import qualified Data.Map as Map
 import Data.Dynamic
 import Data.Typeable
 import GHC (ParsedModule, TypecheckedModule)
-import qualified GhcMod.Cradle as GM
 import Haskell.Ide.Engine.ArtifactMap
 import Language.Haskell.LSP.Types
 

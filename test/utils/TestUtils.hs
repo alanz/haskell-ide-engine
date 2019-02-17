@@ -25,8 +25,7 @@ import           Data.Typeable
 import           Data.Yaml
 import qualified Data.Map as Map
 import           Data.Maybe
-import qualified GhcMod.Monad as GM
-import qualified GhcMod.Types as GM
+import qualified GhcMod.Types as GM (Options(..),defaultOptions,OutputOpts(..),GmLogLevel(..),OutputStyle(..),LineSeparator(..))
 import qualified Language.Haskell.LSP.Core as Core
 import           Haskell.Ide.Engine.MonadTypes
 import           System.Directory

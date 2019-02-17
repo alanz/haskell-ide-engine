@@ -23,15 +23,15 @@ import qualified Data.Text                         as T
 import           ErrUtils
 import           Name
 import           GHC.Generics
-import qualified GhcMod                            as GM
-import qualified GhcMod.DynFlags                   as GM
-import qualified GhcMod.Error                      as GM
-import qualified GhcMod.Gap                        as GM
-import qualified GhcMod.ModuleLoader               as GM
-import qualified GhcMod.Monad                      as GM
-import qualified GhcMod.SrcUtils                   as GM
-import qualified GhcMod.Types                      as GM
-import qualified GhcMod.Utils                      as GM
+import qualified GhcMod                            as GM (IOish,lint,info,Expression(..))
+import qualified GhcMod.DynFlags                   as GM (withDynFlags)
+import qualified GhcMod.Error                      as GM (gcatches,GHandler(..),GhcModError(..),ghcExceptionDoc)
+import qualified GhcMod.Gap                        as GM (mkErrStyle',renderGm,GhcPs)
+import qualified GhcMod.ModuleLoader               as GM (getModulesGhc')
+import qualified GhcMod.Monad                      as GM (GmlT(..),getMMappedFiles,gmgsSession,gmGhcSession,gmsGet)
+import qualified GhcMod.SrcUtils                   as GM (pretty)
+import qualified GhcMod.Types                      as GM (defaultLintOpts)
+import qualified GhcMod.Utils                      as GM (mkRevRedirMapFunc)
 import           Haskell.Ide.Engine.MonadFunctions
 import           Haskell.Ide.Engine.MonadTypes
 import           Haskell.Ide.Engine.PluginUtils

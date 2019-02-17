@@ -9,7 +9,7 @@ import qualified GHC
 import           GHC                               (TypecheckedModule)
 import qualified SrcLoc                            as GHC
 import qualified Var
-import qualified GhcMod.Gap                        as GM
+import qualified GhcMod.Gap                        as GM (GhcPs,GhcRn,GhcTc)
 import           GhcMod.SrcUtils
 
 import           Language.Haskell.LSP.Types

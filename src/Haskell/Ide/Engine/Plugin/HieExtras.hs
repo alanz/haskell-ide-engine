@@ -45,11 +45,11 @@ import           FastString
 import           Finder
 import           GHC                                          hiding (getContext)
 import           GHC.Generics                                 (Generic)
-import qualified GhcMod.Error                                 as GM
-import qualified GhcMod.Exe.CaseSplit                         as GM
-import qualified GhcMod.Gap                                   as GM
-import qualified GhcMod.LightGhc                              as GM
-import qualified GhcMod.Utils                                 as GM
+import qualified GhcMod.Error                                 as GM (GhcModError(..))
+import qualified GhcMod.Exe.CaseSplit                         as GM (splits',SplitResult(..))
+import qualified GhcMod.Gap                                   as GM (listVisibleModuleNames)
+import qualified GhcMod.LightGhc                              as GM (runLightGhc)
+import qualified GhcMod.Utils                                 as GM (withMappedFile)
 import           Haskell.Ide.Engine.ArtifactMap
 import           Haskell.Ide.Engine.Context
 import           Haskell.Ide.Engine.MonadFunctions
