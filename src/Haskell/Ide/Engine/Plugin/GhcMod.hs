@@ -23,13 +23,12 @@ import qualified Data.Text                         as T
 import           ErrUtils
 import           Name
 import           GHC.Generics
-import qualified GhcMod                            as GM (lint,info,Expression(..))
+import qualified GhcMod                            as GM (lint,info,Expression(..),pretty)
 import qualified GhcModCore                        as GM (withDynFlags,IOish,
                                                          gcatches,GHandler(..),GhcModError(..),ghcExceptionDoc,
                                                          mkErrStyle',renderGm,GhcPs,
                                                          getModulesGhc',
                                                          GmlT(..),getMMappedFiles,gmgsSession,gmGhcSession,gmsGet,
-                                                         pretty,
                                                          defaultLintOpts,
                                                          mkRevRedirMapFunc)
 import           Haskell.Ide.Engine.MonadFunctions

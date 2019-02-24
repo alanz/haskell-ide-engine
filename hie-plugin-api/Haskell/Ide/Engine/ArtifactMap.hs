@@ -9,7 +9,8 @@ import qualified GHC
 import           GHC                               (TypecheckedModule)
 import qualified SrcLoc                            as GHC
 import qualified Var
-import qualified GhcModCore                        as GM (GhcPs,GhcRn,GhcTc,collectAllSpansTypes)
+import qualified GhcMod                            as GM (collectAllSpansTypes)
+import qualified GhcModCore                        as GM (GhcPs,GhcRn,GhcTc)
 
 import           Language.Haskell.LSP.Types
 
