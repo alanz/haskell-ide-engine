@@ -248,7 +248,13 @@ installCabal = do
   when (isNothing cabalExe) $
     execStackShake_ ["install", "cabal-install"]
   execCabal_ ["update"]
-
+  -- We need to install Cabal-2.4.1.0 otherwise cabal-helper builds
+  -- with an older, buggy version.  This causes problems if you try to
+  -- use hie with a project having 'Paths_xxx' modules in it (such as
+  -- hie iteslf).  See discussion around
+  -- https://github.com/haskell/haskell-ide-engine/pull/1184
+  ghc <- getStackGhcPathShake
+  execCabal_ ["install", "Cabal-2.4.1.0", "--with-compiler=" ++ ghc]
 
 checkStack :: Action ()
 checkStack = do
