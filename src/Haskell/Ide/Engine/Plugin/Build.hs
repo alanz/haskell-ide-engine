@@ -452,7 +452,8 @@ listCabalTargets :: MonadIO m => FilePath -> FilePath -> m Package
 listCabalTargets distDir' dir =
   runQuery (mkQueryEnv dir distDir') $ do
     pkgName' <- fst <$> packageId
-    cc <- components $ (,) CH.<$> entrypoints
+    -- cc <- components $ (,) CH.<$> entrypoints
+    cc <- components $ (,) <$> entrypoints
     let comps = map (fixupLibraryEntrypoint pkgName' .snd) cc
     absDir <- liftIO $ makeAbsolute dir
     return $ Package pkgName' absDir comps
@@ -470,7 +471,8 @@ listCabalTargets distDir' dir =
 -- apply batches the result per component, and returns the component as the last
 -- item.
 getComponents :: QueryEnv -> IO [(ChEntrypoint,ChComponentName)]
-getComponents env = runQuery env $ components $ (,) CH.<$> entrypoints
+-- getComponents env = runQuery env $ components $ (,) CH.<$> entrypoints
+getComponents env = runQuery env $ components $ (,) <$> entrypoints
 
 -----------------------------------------------
 
