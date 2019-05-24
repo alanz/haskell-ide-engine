@@ -31,9 +31,10 @@ spec = describe "behaviour on malformed projects" $ do
           d ^. severity `shouldBe` (Just DsError)
           d ^. code `shouldBe` Nothing
           d ^. source `shouldBe` Just "ghcmod"
-          d ^. message `shouldBe`
-            (T.pack "readCreateProcess: stack \"build\" \"--only-configure\" \".\" (exit 1): failed\n")
 
+          --   (T.pack "callProcessStderr: stack --stack-yaml=/home/alanz/mysrc/github/alanz/haskell-ide-engine/test/testdata/badProjects/cabal/stack.yaml build --only-configure . (exit 1): failed\n")
+          T.unpack (d ^. message) `shouldStartWith` "callProcessStderr: stack --stack-yaml="
+          T.unpack (d ^. message) `shouldEndWith` "test/testdata/badProjects/cabal/stack.yaml build --only-configure . (exit 1): failed\n"
     -- ---------------------------------
 
 -- ---------------------------------------------------------------------

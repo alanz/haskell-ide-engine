@@ -24,7 +24,7 @@ import qualified System.Log.Logger                     as L
 import           Haskell.Ide.Engine.Plugin.ApplyRefact
 import           Haskell.Ide.Engine.Plugin.Base
 import           Haskell.Ide.Engine.Plugin.Brittany
-import           Haskell.Ide.Engine.Plugin.Build
+-- import           Haskell.Ide.Engine.Plugin.Build
 import           Haskell.Ide.Engine.Plugin.Example2
 import           Haskell.Ide.Engine.Plugin.GhcMod
 import           Haskell.Ide.Engine.Plugin.HaRe
@@ -50,7 +50,7 @@ plugins includeExamples = pluginDescToIdePlugins allPlugins
       [ applyRefactDescriptor "applyrefact"
       , baseDescriptor        "base"
       , brittanyDescriptor    "brittany"
-      , buildPluginDescriptor "build"
+      -- , buildPluginDescriptor "build"
       , ghcmodDescriptor      "ghcmod"
       , haddockDescriptor     "haddock"
       , hareDescriptor        "hare"

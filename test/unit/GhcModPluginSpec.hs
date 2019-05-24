@@ -273,7 +273,7 @@ ghcmodSpec =
               ]
       testCommand testPlugins act "ghcmod" "type" arg res
 
-    it "runs the type command, do bind expr result " $ withCurrentDirectory "./test/testdata" $ do
+    it "runs the type command, do bind expr result" $ withCurrentDirectory "./test/testdata" $ do
       fp <- makeAbsolute "Types.hs"
       let uri = filePathToUri fp
           act = do
