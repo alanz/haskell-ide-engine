@@ -12,7 +12,7 @@ extra-deps:
 - ./submodules/ghc-mod/ghc-project-types
 
 # - brittany-0.11.0.0
-- cabal-plan-0.4.0.0
+- cabal-plan-0.5.0.0
 - constrained-dynamic-0.1.0.0
 - floskell-0.10.0
 - ghc-exactprint-0.5.8.2
@@ -28,7 +28,8 @@ extra-deps:
 - lsp-test-0.5.2.3
 - monad-dijkstra-0.1.1.2
 - optparse-simple-0.1.0
-- pretty-show-1.9.5
+# - pretty-show-1.9.5
+- pretty-show-1.8.2
 - rope-utf16-splay-0.3.1.0
 - syz-0.2.0.0
 - temporary-1.2.1.1
