@@ -1,5 +1,5 @@
 name:                haskell-ide-engine
-version:             0.9.0.0
+version:             0.10.0.0
 synopsis:            Provide a common engine to power any Haskell IDE
 description:         Please see README.md
 homepage:            http://github.com/githubuser/haskell-ide-engine#readme
@@ -74,7 +74,7 @@ library
                      , haskell-lsp-types == 0.13.*
                      , haskell-src-exts
                      , hie-plugin-api
-                     , hlint >= 2.0.11 && < 2.1.18
+                     , hlint (>= 2.0.11 && < 2.1.18) || >= 2.1.22
                      , hoogle >= 5.0.13
                      , hsimport
                      , hslogger
@@ -173,10 +173,11 @@ test-suite unit-test
                        DiffSpec
                        ExtensibleStateSpec
                        GhcModPluginSpec
-                       LiquidSpec
                        HaRePluginSpec
                        HooglePluginSpec
                        JsonSpec
+                       LiquidSpec
+                       PackagePluginSpec
                        Spec
   -- Technically cabal-helper should be a 'run-tool-depends', but that doesn't exist yet
   build-tool-depends:  cabal-helper:cabal-helper-main, hspec-discover:hspec-discover
