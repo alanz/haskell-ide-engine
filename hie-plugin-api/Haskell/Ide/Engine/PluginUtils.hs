@@ -54,7 +54,7 @@ import           Language.Haskell.LSP.VFS
 import           Language.Haskell.LSP.Types.Capabilities
 import qualified Language.Haskell.LSP.Types            as J
 import           Prelude                               hiding (log)
-import           SrcLoc
+import           SrcLoc                                hiding (getRealSrcSpan)
 import           System.Directory
 import           System.FilePath
 import qualified Data.Rope.UTF16 as Rope
