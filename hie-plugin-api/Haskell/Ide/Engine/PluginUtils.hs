@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                 #-}
 {-# LANGUAGE DataKinds           #-}
 {-# LANGUAGE GADTs               #-}
 {-# LANGUAGE OverloadedStrings   #-}
@@ -54,7 +55,11 @@ import           Language.Haskell.LSP.VFS
 import           Language.Haskell.LSP.Types.Capabilities
 import qualified Language.Haskell.LSP.Types            as J
 import           Prelude                               hiding (log)
+#if MIN_VERSION_ghc(8, 8, 0)
 import           SrcLoc                                hiding (getRealSrcSpan)
+#else
+import           SrcLoc
+#endif
 import           System.Directory
 import           System.FilePath
 import qualified Data.Rope.UTF16 as Rope
