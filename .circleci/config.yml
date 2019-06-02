@@ -184,7 +184,7 @@ jobs:
       - run:
           name: Build
           command: cabal new-build -j1 # need j1, else ghc-lib-parser triggers OOM
-          no_output_timeout: 30m
+          no_output_timeout: 60m
       - save_cache:
           key: cabal-{{ .Environment.HIE_CACHE }}-{{ arch }}-{{ .Environment.CIRCLE_JOB }}
           paths:
