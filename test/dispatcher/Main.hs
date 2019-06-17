@@ -21,7 +21,6 @@ import           Haskell.Ide.Engine.Types
 import           Language.Haskell.LSP.Types
 import           TestUtils
 import           System.Directory
-import           System.Environment
 import           System.FilePath
 
 import           Test.Hspec
@@ -75,10 +74,7 @@ startServer = do
   -- env <- getEnvironment -- AZ
   -- putStrLn $ "startServer:env=" ++ show env -- AZ
   dispatcher <- forkIO $ do
-    unsetEnv "GHC_PACKAGE_PATH"
-    unsetEnv "GHC_ENVIRONMENT"
-    unsetEnv "HASKELL_PACKAGE_SANDBOX"
-    unsetEnv "HASKELL_PACKAGE_SANDBOXES"
+    flushStackEnvironment
     runScheduler
       scheduler
       (\lid errCode e -> logToChan logChan ("received an error", Left (lid, errCode, e)))
