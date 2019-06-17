@@ -43,8 +43,8 @@ import           Text.Blaze.Internal
 testOptions :: BiosOptions
 testOptions = defaultOptions {
     boLogging   = BlError
-      -- boLoggingg       = BlDebug
-      -- boLoggingg       = BlVomit
+    -- boLogging   = BlDebug
+    -- boLogging        = BlVomit
     -- , boGhcUserOptions = ["-v4", "-DDEBUG"]
     }
 
@@ -97,6 +97,7 @@ setupStackFiles =
     resolver <- readResolver
     writeFile (f ++ "stack.yaml") $ stackFileContents resolver
     removePathForcibly (f ++ ".stack-work")
+    removePathForcibly (f ++ "stack.yaml.lock") -- stack >= 2.1
 
 -- ---------------------------------------------------------------------
 
@@ -136,7 +137,7 @@ ghcVersion = GHCPre84
 stackYaml :: FilePath
 stackYaml =
 #if (defined(MIN_VERSION_GLASGOW_HASKELL) && (MIN_VERSION_GLASGOW_HASKELL(8,6,5,0)))
-  "stack.yaml"
+  "stack-8.6.5.yaml"
 #elif (defined(MIN_VERSION_GLASGOW_HASKELL) && (MIN_VERSION_GLASGOW_HASKELL(8,6,4,0)))
   "stack-8.6.4.yaml"
 #elif (defined(MIN_VERSION_GLASGOW_HASKELL) && (MIN_VERSION_GLASGOW_HASKELL(8,6,3,0)))
