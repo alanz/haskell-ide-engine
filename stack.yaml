@@ -1,4 +1,4 @@
-resolver: nightly-2019-07-31 # GHC 8.6.5
+resolver: nightly-2019-09-01 # GHC 8.6.5
 packages:
 - .
 - hie-plugin-api
@@ -21,12 +21,12 @@ extra-deps:
 - haskell-lsp-0.15.0.0
 - haskell-lsp-types-0.15.0.0
 - hlint-2.2.2
+- hoogle-5.0.17.11
 - hsimport-0.10.0
 - lsp-test-0.6.0.0
 - monad-dijkstra-0.1.1.2@rev:1
 - syz-0.2.0.0
 - temporary-1.2.1.1
-- yaml-0.8.32
 
 flags:
   haskell-ide-engine:
