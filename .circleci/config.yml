@@ -27,8 +27,8 @@ defaults: &defaults
           - stack-cache-{{ .Environment.HIE_CACHE }}-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "resolver.txt" }}
 
     - run:
-        name: Stack update
-        command: stack -j 2 --stack-yaml=${STACK_FILE} update
+        name: Stack upgrade
+        command: stack -j 2 --stack-yaml=${STACK_FILE} upgrade
 
     - run:
         name: Stack setup
