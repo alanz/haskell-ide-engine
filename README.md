@@ -4,6 +4,7 @@
 [![License BSD3][badge-license]][license]
 [![CircleCI][badge-circleci]][circleci]
 [![AppVeyor][badge-appveyor]][appveyor]
+[![Open Source Helpers](https://www.codetriage.com/haskell/haskell-ide-engine/badges/users.svg)](https://www.codetriage.com/haskell/haskell-ide-engine)
 
 [badge-license]: https://img.shields.io/badge/license-BSD3-green.svg?dummy
 [license]: https://github.com/haskell/haskell-ide-engine/blob/master/LICENSE
@@ -37,9 +38,11 @@ we talk to clients.__
       - [Using VS Code with Nix](#using-vs-code-with-nix)
     - [Using HIE with Sublime Text](#using-hie-with-sublime-text)
     - [Using HIE with Vim or Neovim](#using-hie-with-vim-or-neovim)
-      - [vim-plug](#vim-plug)
-      - [Vim 8.0](#vim-80)
-      - [Sample `~/.vimrc`](#sample-vimrc)
+      - [Coc](#Coc)
+      - [LanguageClient-neovim](#LanguageClient-neovim)
+        - [vim-plug](#vim-plug)
+        - [Clone the LanguageClient-neovim repo](#clone-the-languageclient-neovim-repo)
+        - [Sample `~/.vimrc`](#sample-vimrc)
     - [Using HIE with Atom](#using-hie-with-atom)
     - [Using HIE with Emacs](#using-hie-with-emacs)
     - [Using HIE with Spacemacs](#using-hie-with-spacemacs)
@@ -129,12 +132,12 @@ Follow the instructions at https://github.com/Infinisil/all-hies
 
 ### Installation on ArchLinux
 
-An [haskell-ide-engine-git](https://aur.archlinux.org/packages/haskell-ide-engine-git/) package is available on the AUR.
+An [haskell-ide-engine](https://aur.archlinux.org/packages/haskell-ide-engine/) package is available on the AUR.
 
 Using [Aura](https://github.com/aurapm/aura):
 
 ```
-# aura -A haskell-ide-engine-git
+# aura -A haskell-ide-engine
 ```
 
 
@@ -201,20 +204,34 @@ stack ./install.hs help
 
 Remember, this will take time to download a Stackage-LTS and an appropriate GHC. However, afterwards all commands should work as expected.
 
+##### Install via cabal
+
+The install-script can be invoked via `cabal` instead of `stack` with the command
+
+```bash
+cabal v2-run ./install.hs --project-file install/shake.project <target>
+```
+
+Running the script with cabal on windows seems to have some issues and is currently not fully supported.
+
+Unfortunately, it is still required to have `stack` installed so that the install-script can locate the `local-bin` directory (on Linux `~/.local/bin`) and copy the `hie` binaries to `hie-x.y.z`, which is required for the `hie-wrapper` to function as expected.
+
+For brevity, only the `stack`-based commands are presented in the following sections.
+
 ##### Install specific GHC Version
 
 Install **Nightly** (and hoogle docs):
 
 ```bash
 stack ./install.hs hie-8.6.4
-stack ./install.hs build-doc
+stack ./install.hs build-data
 ```
 
 Install **LTS** (and hoogle docs):
 
 ```bash
 stack ./install.hs hie-8.4.4
-stack ./install.hs build-doc
+stack ./install.hs build-data
 ```
 
 The Haskell IDE Engine can also be built with `cabal new-build` instead of `stack build`.
@@ -223,7 +240,7 @@ However, this approach does currently not work for windows due to a missing feat
 To see what GHC versions are available, the command `stack install.hs cabal-ghcs` can be used.
 It will list all GHC versions that are on the path and their respective installation directory.
 If you think, this list is incomplete, you can try to modify the PATH variable, such that the executables can be found.
-Note, that the targets `cabal-build`, `cabal-build-doc` and `cabal-build-all` depend on the found GHC versions.
+Note, that the targets `cabal-build`, `cabal-build-data` and `cabal-build-all` depend on the found GHC versions.
 They install Haskell IDE Engine only for the found GHC versions.
 
 An example output is:
@@ -242,7 +259,7 @@ If your desired ghc has been found, you use it to install Haskell IDE Engine.
 
 ```bash
 stack install.hs cabal-hie-8.4.4
-stack install.hs cabal-build-doc
+stack install.hs cabal-build-data
 ```
 
 To install HIE for all GHC versions that are present on your system, use:
@@ -346,7 +363,7 @@ in
 }
 ```
 
-Now open a haskell project with Sublime Text. You should have these features available to you:
+Now open a Haskell project with Sublime Text. You should have these features available to you:
 
 1. Errors are underlined in red
 2. LSP: Show Diagnostics will show a list of hints and errors
@@ -354,11 +371,42 @@ Now open a haskell project with Sublime Text. You should have these features ava
 
 ### Using HIE with Vim or Neovim
 
-As above, make sure HIE is installed. These instructions are for using the [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim) client.
+As above, make sure HIE is installed.
+Then you can use [Coc](https://github.com/neoclide/coc.nvim), [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
+or any other vim Langauge server protocol client.
+Coc is recommend since it is the only complete LSP implementation for Vim and Neovim and offers snippets and floating documentation out of the box.
 
-#### vim-plug
-If you use [vim-plug](https://github.com/junegunn/vim-plug), then you can do this by e.g.
-including the following line in the Plug section of your `init.vim`:
+#### Coc
+Follow Coc's [installation instructions](https://github.com/neoclide/coc.nvim),
+Then issue `:CocConfig` and add the following to your Coc config file.
+
+```jsonc
+"languageserver": {
+  "haskell": {
+    "command": "hie-wrapper",
+    "rootPatterns": [
+      ".stack.yaml",
+      "cabal.config",
+      "package.yaml"
+    ],
+    "filetypes": [
+      "hs",
+      "lhs",
+      "haskell"
+    ],
+    "initializationOptions": {
+      "languageServerHaskell": {
+      }
+    },
+  }
+}
+```
+
+#### LanguageClient-neovim
+
+##### vim-plug
+If you use [vim-plug](https://github.com/junegunn/vim-plug), then you can do this by e.g.,
+including the following line in the Plug section of your `init.vim` or `~/.vimrc`:
 
 ```
 Plug 'autozimu/LanguageClient-neovim', {
@@ -367,13 +415,13 @@ Plug 'autozimu/LanguageClient-neovim', {
     \ }
 ```
 
-and issuing a `:PlugInstall` command within neovim.
+and issuing a `:PlugInstall` command within Neovim or Vim.
 
-#### Vim 8.0
-Clone [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
+##### Clone the LanguageClient-neovim repo
+As an alternative to using [vim-plug](https://github.com/junegunn/vim-plug) shown above, clone [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
 into `~/.vim/pack/XXX/start/`, where `XXX` is just a name for your "plugin suite".
 
-#### Sample `~/.vimrc`
+##### Sample `~/.vimrc`
 
 ```vim
 set rtp+=~/.vim/pack/XXX/start/LanguageClient-neovim
@@ -611,7 +659,12 @@ These builds have a dependency on [homebrew](https://brew.sh)'s `gmp` library. I
 ### cannot satisfy -package-id \<package\>
 
 #### Is \<package\> base-x?
-Make sure that you are running the correct version of hie for your version of ghc, or check out hie-wrapper.
+Make sure that the GHC version of HIE matches the one of the project. After that run
+```
+$ cabal configure
+```
+
+and then restart HIE (e.g. by restarting your editor).
 
 #### Is there a hash (#) after \<package\>?
 Delete any `.ghc.environment*` files in your project root and try again. (At the time of writing, cabal new-style projects are not supported with ghc-mod)

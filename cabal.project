@@ -10,4 +10,5 @@ packages:
 
 tests: true
 
--- allow-newer:brittany-0.11.0.0:ghc-exactprint
+package haskell-ide-engine
+  test-show-details: direct

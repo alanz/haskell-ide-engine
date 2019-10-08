@@ -108,10 +108,8 @@ files =
   [  "./test/testdata/"
    , "./test/testdata/addPackageTest/cabal-exe/"
    , "./test/testdata/addPackageTest/hpack-exe/"
-   , "./test/testdata/addPackageTest/hybrid-exe/"
    , "./test/testdata/addPackageTest/cabal-lib/"
    , "./test/testdata/addPackageTest/hpack-lib/"
-   , "./test/testdata/addPackageTest/hybrid-lib/"
    , "./test/testdata/addPragmas/"
    , "./test/testdata/badProjects/cabal/"
    , "./test/testdata/completion/"
@@ -163,16 +161,15 @@ stackYaml =
 #endif
 
 logFilePath :: String
-logFilePath = "functional-hie-" ++ stackYaml ++ ".log"
+logFilePath = "hie-" ++ stackYaml ++ ".log"
 
 -- | The command to execute the version of hie for the current compiler.
--- Make sure to disable the STACK_EXE and GHC_PACKAGE_PATH environment
--- variables or else it messes up -- ghc-mod.
--- We also need to unset STACK_EXE manually inside the tests if they are
--- run with `stack test`
+--
+-- Both @stack test@ and @cabal new-test@ setup the environment so @hie@ is
+-- on PATH. Cabal seems to respond to @build-tool-depends@ specifically while
+-- stack just puts all project executables on PATH.
 hieCommand :: String
-hieCommand = "stack exec --no-stack-exe --no-ghc-package-path --stack-yaml=" ++ stackYaml ++
-             " hie -- -d -l test-logs/" ++ logFilePath
+hieCommand = "hie -d -l test-logs/" ++ logFilePath
 
 hieCommandVomit :: String
 hieCommandVomit = hieCommand ++ " --vomit"

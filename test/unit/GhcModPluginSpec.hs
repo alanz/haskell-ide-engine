@@ -15,7 +15,7 @@ import           Haskell.Ide.Engine.MonadTypes
 import           Haskell.Ide.Engine.Plugin.GhcMod
 import           Haskell.Ide.Engine.PluginUtils
 import           Haskell.Ide.Engine.Support.HieExtras
-import           Language.Haskell.LSP.Types          (TextEdit (..))
+import           Language.Haskell.LSP.Types          (TextEdit (..), toNormalizedUri)
 import           System.Directory
 import           TestUtils
 
@@ -51,7 +51,7 @@ ghcmodSpec =
         ss -> fail $ "got:" ++ show ss
       let
           res = IdeResultOk $
-            (Map.singleton arg (S.singleton diag), env)
+            (Diagnostics (Map.singleton (toNormalizedUri arg) (S.singleton diag)), env)
           diag = Diagnostic (Range (toPos (4,7))
                                    (toPos (4,8)))
                             (Just DsError)
@@ -486,9 +486,9 @@ ghcmodSpec =
               , (Range (toPos (33, 15)) (toPos (33, 19)), "Int -> Test -> ShowS")
               , (Range (toPos (33, 15)) (toPos (33, 19)), "Test -> String")
               , (Range (toPos (33, 15)) (toPos (33, 19)), "[Test] -> ShowS")
-              , (Range (toPos (33, 15)) (toPos (33, 19)), "Int -> Test -> ShowS")
 #if (defined(MIN_VERSION_GLASGOW_HASKELL) && (MIN_VERSION_GLASGOW_HASKELL(8,4,0,0)))
 #else
+              , (Range (toPos (33, 15)) (toPos (33, 19)), "Int -> Test -> ShowS")
               , (Range (toPos (33, 15)) (toPos (33, 19)), "[Test] -> ShowS")
 #endif
               ]
@@ -505,9 +505,9 @@ ghcmodSpec =
               [ (Range (toPos (33, 21)) (toPos (33, 23)), "(Test -> Test -> Bool) -> (Test -> Test -> Bool) -> Eq Test")
               , (Range (toPos (33, 21)) (toPos (33, 23)), "Test -> Test -> Bool")
               , (Range (toPos (33, 21)) (toPos (33, 23)), "Test -> Test -> Bool")
-              , (Range (toPos (33, 21)) (toPos (33, 23)), "Test -> Test -> Bool")
 #if (defined(MIN_VERSION_GLASGOW_HASKELL) && (MIN_VERSION_GLASGOW_HASKELL(8,4,0,0)))
 #else
+              , (Range (toPos (33, 21)) (toPos (33, 23)), "Test -> Test -> Bool")
               , (Range (toPos (33, 21)) (toPos (33, 23)), "Test -> Test -> Bool")
 #endif
               ]
