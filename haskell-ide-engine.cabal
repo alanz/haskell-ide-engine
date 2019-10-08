@@ -2,7 +2,7 @@ name:                haskell-ide-engine
 version:             0.12.0.0
 synopsis:            Provide a common engine to power any Haskell IDE
 description:         Please see README.md
-homepage:            http://github.com/haskel/haskell-ide-engine#readme
+homepage:            http://github.com/haskell/haskell-ide-engine#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Many, TBD when we release
