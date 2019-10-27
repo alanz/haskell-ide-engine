@@ -23,6 +23,7 @@ module Haskell.Ide.Engine.ModuleCache
   , cacheModules
   , cacheInfoNoClear
   , runActionWithContext
+  , runWithContext
   , ModuleCache(..)
   ) where
 
@@ -96,6 +97,19 @@ runActionWithContext df (Just uri) action = do
     IdeResultOk () -> fmap IdeResultOk action
     IdeResultFail err -> return $ IdeResultFail err
 
+-- ---------------------------------------------------------------------
+
+runWithContext :: Uri -> IdeGhcM a -> IdeGhcM a
+runWithContext uri act = case uriToFilePath uri of
+  Just fp -> do
+    df <- GHC.getSessionDynFlags
+    res <- runActionWithContext df (Just fp) act
+    case res of
+      IdeResultOk a -> return a
+      IdeResultFail err -> error $ "Could not run in context: " ++ show err
+  Nothing -> error $ "uri not valid: " ++ show uri
+
+-- ---------------------------------------------------------------------
 
 -- | Load the Cradle based on the given DynFlags and Cradle lookup Result.
 -- Reuses a Cradle if possible and sets up a GHC session for a new Cradle
