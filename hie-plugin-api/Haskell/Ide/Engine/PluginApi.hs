@@ -38,7 +38,7 @@ module Haskell.Ide.Engine.PluginApi
   , HIE.IdeState(..)
   , HIE.IdeGhcM
   , HIE.runIdeGhcM
-  , runIdeGhcMBare
+  , HIE.runIdeGhcMBare
   , HIE.IdeM
   , HIE.runIdeM
   , HIE.IdeDeferM
@@ -61,6 +61,8 @@ module Haskell.Ide.Engine.PluginApi
   , BiosLogLevel
   , BiosOptions
   , defaultOptions
+  , HIE.BIOSVerbosity(..)
+  , HIE.CradleOpts(..)
   ) where
 
 
@@ -78,5 +80,5 @@ defaultOptions = HIE.defaultCradleOpts
 type BiosLogLevel = HIE.BIOSVerbosity
 
 type BiosOptions = HIE.CradleOpts
-runIdeGhcMBare :: a
-runIdeGhcMBare = error "Not implemented"
+-- runIdeGhcMBare :: a
+-- runIdeGhcMBare = error "Not implemented"
