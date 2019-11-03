@@ -143,6 +143,7 @@ loadCradle iniDynFlags (NewCradle fp) = do
   logm $ "Found cradle: " ++ show cradle
   liftIO (GHC.newHscEnv iniDynFlags) >>= GHC.setSession
   liftIO $ setCurrentDirectory (BIOS.cradleRootDir cradle)
+  logm $ "loadCradle:setCurrentDirectory: " ++ BIOS.cradleRootDir cradle
   withProgress "Initialising Cradle" NotCancellable (initialiseCradle cradle)
 
  where

@@ -323,6 +323,26 @@ cabalModuleGraphs = do
 
 -- ---------------------------------------------------------------------
 
+{-
+cabalModuleGraphsOld :: IdeGhcM [GM.GmModuleGraph]
+cabalModuleGraphsOld = doCabalModuleGraphs
+  where
+    doCabalModuleGraphs :: (GM.IOish m) => GM.GhcModT m [GM.GmModuleGraph]
+    doCabalModuleGraphs = do
+      crdl <- GM.cradle
+      case GM.cradleCabalFile crdl of
+        Just _ -> do
+          mcs <- GM.cabalResolvedComponents
+          let graph = map GM.gmcHomeModuleGraph $ Map.elems mcs
+          return graph
+        Nothing -> return []
+-}
+
+-- ---------------------------------------------------------------------
+
+
+-- ---------------------------------------------------------------------
+
 makeRevRedirMapFunc :: IdeGhcM (FilePath -> FilePath)
 makeRevRedirMapFunc = reverseFileMap
 

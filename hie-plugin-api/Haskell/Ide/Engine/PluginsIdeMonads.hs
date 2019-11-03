@@ -455,6 +455,9 @@ persistVirtualFile uri = do
 persistVirtualFile' :: Core.LspFuncs Config -> Uri -> IO FilePath
 persistVirtualFile' lf uri = Core.persistVirtualFileFunc lf (toNormalizedUri uri)
 
+-- | When a Virtual file has been persisted, this function maps the
+-- original file name to the persisted temporary file created from the
+-- virtual file.
 reverseFileMap :: (MonadIde m, MonadIO m) => m (FilePath -> FilePath)
 reverseFileMap = do
     mlf <- ideEnvLspFuncs <$> getIdeEnv

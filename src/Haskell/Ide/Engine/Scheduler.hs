@@ -307,6 +307,8 @@ ghcDispatcher env@DispatcherEnv { docVersionTVar } errorHandler callbackHandler 
     debugm $ "ghcDispatcher:got request " ++ show tn ++ " with id: " ++ show mid
 
     let
+      -- Warning: runActionWithContext will currently call
+      -- setCurrentDirectory if initialising a new cradle
       runner act = case context of
         Nothing  -> runActionWithContext iniDynFlags Nothing act
         Just uri -> case uriToFilePath uri of
