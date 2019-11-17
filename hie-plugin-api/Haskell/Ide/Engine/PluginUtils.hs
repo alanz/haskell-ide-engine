@@ -279,7 +279,7 @@ readVFS :: (MonadIde m, MonadIO m) => Uri -> m (Maybe T.Text)
 readVFS uri = do
   mvf <- getVirtualFile uri
   case mvf of
-    Just (VirtualFile _ txt _) -> return $ Just (Rope.toText txt)
+    Just (VirtualFile _ txt) -> return $ Just (Rope.toText txt)
     Nothing -> return Nothing
 
 getRangeFromVFS :: (MonadIde m, MonadIO m) => Uri -> Range -> m (Maybe T.Text)
@@ -299,5 +299,3 @@ gcatches act handlers = gcatch act h
   where
     h :: SomeException -> m a
     h e = foldr (\(ErrorHandler hand) me -> maybe me hand (fromException e)) (liftIO $ throw e) handlers
-
-
