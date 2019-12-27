@@ -5,7 +5,8 @@ packages:
 
 extra-deps:
 # - ./submodules/HaRe
-- ./submodules/cabal-helper
+# - ./submodules/cabal-helper
+- https://hackage.haskell.org/package/cabal-helper-1.0.0.0/candidate/cabal-helper-1.0.0.0.tar.gz
 
 - base-compat-0.9.3
 - brittany-0.12.1.0

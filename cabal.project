@@ -3,7 +3,8 @@ packages:
          ./hie-plugin-api/
 
          -- ./submodules/HaRe
-         ./submodules/cabal-helper/
+         -- ./submodules/cabal-helper/
+         https://hackage.haskell.org/package/cabal-helper-1.0.0.0/candidate/cabal-helper-1.0.0.0.tar.gz
 
 tests: true
 
